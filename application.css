@@ -1,0 +1,14 @@
+.child {
+	-fx-background-color: linear-gradient(to right, #EECFBA, #C5DDE8);
+}
+.button {
+	-fx-text-fill:blue;
+}
+.another-number {
+	-fx-border-color: #C5DDE8;
+}
+.scroll-pane {
+	
+	 -fx-pref-width: 75px;
+}
+
