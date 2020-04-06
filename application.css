@@ -1,14 +1,28 @@
-.child {
-	-fx-background-color: linear-gradient(to right, #EECFBA, #C5DDE8);
+.table-view {
+   
+    -fx-padding: 5;
 }
-.button {
-	-fx-text-fill:blue;
+#mainWindow {
+	-fx-background-image: url("ThisCow.jpg");
 }
-.another-number {
-	-fx-border-color: #C5DDE8;
+#gameWindow {
+	-fx-background-image: url("cowGame.jpg");
 }
-.scroll-pane {
-	
-	 -fx-pref-width: 75px;
+#buttonPlay {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonCPlay.png");
 }
+#buttonRules {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonCRules.png");
+}
+#buttonExit {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonCExit.png");
+}
+
+
 
