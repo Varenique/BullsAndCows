@@ -7,47 +7,67 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.IntegerProperty;
 
 public class Number {
-	private int firstProperty;
-	private int secondProperty;
-	private int thirdProperty;
-	private int fourthProperty;
+	private int firstDigit;
+	private int secondDigit;
+	private int thirdDigit;
+	private int fourthDigit;
 	private String fifthProperty;
 
-	public Number(int firstProperty, int secondProperty, int thirdProperty, int fourthProperty , String fifthProperty) {
-        this.firstProperty = firstProperty;
-        this.secondProperty = secondProperty;
-        this.thirdProperty = thirdProperty;
-        this.fourthProperty = fourthProperty;
+	public Number(int firstDigit, int secondDigit, int thirdDigit, int fourthDigit , String fifthProperty) {
+        this.firstDigit = firstDigit;
+        this.secondDigit = secondDigit;
+        this.thirdDigit = thirdDigit;
+        this.fourthDigit = fourthDigit;
         this.fifthProperty = fifthProperty;
-    }
-	 public int getFirstProperty() {
-	        return firstProperty;
+    } 
+	public Number (int number, int[] bullsAndCows) {
+		fourthDigit = number % 10;
+		number /= 10;
+		thirdDigit = number % 10;
+		number /= 10;
+		secondDigit = number % 10;
+		number /= 10;
+		firstDigit = number % 10;
+		
+		fifthProperty = String.valueOf(bullsAndCows[0])+" bulls "+String.valueOf(bullsAndCows[1])+" cows";
+	}
+	public int getNumber() {
+		return firstDigit*1000+secondDigit*100+thirdDigit*10+ fourthDigit;
+	}
+	public int getFirstDigit() {
+	        return firstDigit;
 	    }
 
-	    public void setFirstProperty(int firstProperty ) {
-	        this.firstProperty = firstProperty;
+	    public void setFirstDigit(int firstDigit ) {
+	        this.firstDigit = firstDigit;
 	    }
 
-	    public int getSecondProperty() {
-	        return secondProperty ;
+	    public int getSecondDigit() {
+	        return secondDigit ;
 	    }
 
-	    public void setSecondProperty(int secondProperty) {
-	        this.secondProperty = secondProperty;
+	    public void setSecondDigit(int secondDigit) {
+	        this.secondDigit = secondDigit;
 	    }
-	    public int getThirdProperty() {
-	        return thirdProperty;
-	    }
-
-	    public void setThirdProperty(int thirdProperty ) {
-	        this.thirdProperty = thirdProperty;
-	    }
-	    public int getFourthProperty() {
-	        return fourthProperty;
+	    public int getThirdDigit() {
+	        return thirdDigit;
 	    }
 
-	    public void setFourthProperty(int fourthProperty) {
-	        this.fourthProperty = fourthProperty;
+	    public void setThirdProperty(int thirdDigit ) {
+	        this.thirdDigit = thirdDigit;
+	    }
+	    public int getFourthDigit() {
+	        return fourthDigit;
 	    }
 
+	    public void setFourthDigit(int fourthDigit) {
+	        this.fourthDigit = fourthDigit;
+	    }
+	    public String getFifthProperty() {
+	        return fifthProperty;
+	    }
+
+	    public void setFifthProperty(String fifthProperty) {
+	        this.fifthProperty = fifthProperty;
+	    }
 }
