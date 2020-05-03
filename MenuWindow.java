@@ -1,21 +1,28 @@
 package application;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class MenuWindow {
+	//private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private Stage primaryStage;
 	private AnchorPane root;
 	private Button buttonPlay;
@@ -95,9 +102,33 @@ public class MenuWindow {
 		AnchorPane.setTopAnchor(buttonExit, 585.0);
 		buttonExit.setOnMouseClicked(mouseEvent -> {
 			primaryStage.close();});
+	
+		//Time demo-version
+		Label label = new Label();
+		int[] time = {01, 00}; 
+		label.setText("01:00");
 		
-		root.getChildren().addAll(buttonPlay, buttonContinue, buttonRules, buttonExit);
-		
+		Timeline timeline = new Timeline (
+		    new KeyFrame (
+		        Duration.millis(1000 * 1), //1000 мс * 60 сек = 1 мин
+		        ae -> {
+		            
+		            if(time[1]==0) {
+		            	time[1]= 60;
+		            	time[0]--;
+		            }
+		            time[1]--;
+		            label.setText("" + time[0]+":"+time[1]);
+		        }
+		    )
+		);
+
+		timeline.setCycleCount(60); 
+		timeline.play(); 
+        
+        
+        
+        root.getChildren().addAll(buttonPlay, buttonContinue, buttonRules, buttonExit, label);
 		Scene scene = new Scene(root,1000,700);
 		primaryStage.setScene(scene);
 		primaryStage.show();
