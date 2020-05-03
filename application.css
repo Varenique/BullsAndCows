@@ -3,26 +3,38 @@
     -fx-padding: 5;
 }
 #mainWindow {
-	-fx-background-image: url("ThisCow.jpg");
+	-fx-background-image: url("menuCow.jpg");
 }
 #gameWindow {
-	-fx-background-image: url("cowGame.jpg");
+	-fx-background-image: url("gameCow.jpg");
 }
 #buttonPlay {
 	-fx-background-color: transparent;
 	-fx-font-size: 20px;
-	-fx-background-image: url("buttonCPlay.png");
+	-fx-background-image: url("buttonPlay.png");
 }
 #buttonRules {
 	-fx-background-color: transparent;
 	-fx-font-size: 20px;
-	-fx-background-image: url("buttonCRules.png");
+	-fx-background-image: url("buttonRules.png");
 }
 #buttonExit {
 	-fx-background-color: transparent;
 	-fx-font-size: 20px;
-	-fx-background-image: url("buttonCExit.png");
+	-fx-background-image: url("buttonExit.png");
 }
-
-
-
+#buttonContinue {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonContinue.png");
+}
+#buttonSend {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonSend.png");
+}
+#buttonBack {
+	-fx-background-color: transparent;
+	-fx-font-size: 20px;
+	-fx-background-image: url("buttonBack.png");
+}
