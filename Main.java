@@ -11,7 +11,8 @@ public class Main extends Application {
 //      timeThread.start();	
 		GameModel model = new GameModel();
 		BullsAndCowsController controller = new BullsAndCowsController(model);
-		MenuWindow mainWindow = new MenuWindow(controller);	
+		MenuWindow mainWindow = new MenuWindow(controller);
+
 		
 	}
 		

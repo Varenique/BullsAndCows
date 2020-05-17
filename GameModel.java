@@ -1,5 +1,6 @@
 package application;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -17,32 +18,130 @@ public class GameModel {
 	private int [] variants = new int[5040];
 	private FileWriter writer;
 	private FileReader reader;
+	private ArrayList<String> data = new ArrayList<String>();
+	private ArrayList<String> replaySteps = new ArrayList<String>();
 	int maxValue = 5040;
 	String fileName = "last.txt";
 	String fileNameBoolean = "lastBoolean.txt";
+	String directoryPath = "C:\\Users\\User\\eclipse-workspace\\BullsAndCowsUpdate\\filesOfData";
 	ObservableList<Number> playerTable;
 	ObservableList<Number> computerTable;
 	String lastAnswers = "";
+	String allAnswers = "";
+	File directory;
 	GameModel(){
 		playerNumber = new DataOfNumbers();
 		computerNumber = new DataOfNumbers();
-		computerNumber.setNumber(generateComputerNumber());
-		
-		
+		computerNumber.setNumber(generateComputerNumber());	
+		directory = new File(directoryPath);
+		if(!directory.isDirectory()) {
+			if(!directory.mkdir()) {
+				System.out.println("Directory doesn't created");
+			}
+		}
 	}
-
-	public void readAll() {	
+	public ArrayList<String> getReplaySteps(){
+		return replaySteps;
+	}
+	public void saveFile(String replayFile) {
+		replayFile +=".txt";
+		//File newFile = new File(directoryPath+"\\"+replayFile); 
+        try {
+			//if(newFile.createNewFile()) {
+				System.out.println(allAnswers);
+				FileWriter writerReplay = new FileWriter(directoryPath+"\\"+replayFile);
+				writerReplay.write(String.valueOf(computerNumber.getNumber())+"\n"+String.valueOf(playerNumber.getNumber())+allAnswers);
+				writerReplay.close();
+			//}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public String getAllFiles() {
+		String allFiles = "";
+		if(directory.isDirectory()) {
+			for (File file : directory.listFiles()){
+				allFiles+=file.getName();
+				allFiles+="\n";
+			}
+		}
+		if(allFiles.equals("")) {
+			allFiles = "No saved games.";
+		}
+		return allFiles;
+	}
+//	public ObservableList<Number> getOneStep(String fileNameReplay) {
+//		ObservableList<Number> tableData = FXCollections.observableArrayList();
+//		fileNameReplay= directoryPath + "\\" + fileNameReplay;
+//			try {
+//				reader = new FileReader(fileNameReplay);
+//				Scanner scan = new Scanner(reader);
+//				int i = 1;
+//				
+//		        lastAnswers = "";
+//		        if (scan.hasNextLine()) {
+//		        	int number = Integer.valueOf(scan.nextLine());
+//		        	int[] array = new int[2];
+//		        	array[0] = Integer.valueOf(scan.nextLine());
+//		        	array[1] = Integer.valueOf(scan.nextLine());
+//		        	tableData.add(new Number(number, array));	
+//		        	i++;
+//		        }
+//				reader.close();
+//			} 
+//			catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			
+//		return tableData;	
+//	}
+	public void readReplay(String fileNameReplay) {
+		fileNameReplay= directoryPath + "\\" + fileNameReplay;
+		//System.out.println(fileNameReplay);
+		if(replaySteps != null) {
+			replaySteps.clear();
+		}
+		try {
+			reader = new FileReader(fileNameReplay);
+			Scanner scan = new Scanner(reader);
+			int i = 1;
+			
+	        lastAnswers = "";
+	        while (scan.hasNextLine()) {
+	        	if(i==1) {
+	        		computerNumber.setNumber(Integer.valueOf(scan.nextLine()));
+	        	}
+	        	if(i==2) {
+	        		playerNumber.setNumber(Integer.valueOf(scan.nextLine()));
+	        	}
+	        	if(i>2) {
+	        		replaySteps.add(scan.nextLine());
+	        	}
+	        	i++;
+	        }
+			reader.close();
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void readAll(String anyFileName) {	
+		if(anyFileName.equals("")) {
+			anyFileName = fileName;
+		}
+		else {
+			anyFileName= directoryPath + "\\" + anyFileName;
+		}
 		playerTable = FXCollections.observableArrayList();
 		computerTable = FXCollections.observableArrayList();;
 		
 		try {
-			reader = new FileReader(fileName);
+			reader = new FileReader(anyFileName);
 			Scanner scan = new Scanner(reader);
 			int i = 1;
 	        int j = 0;
 	        lastAnswers = "";
 	        while (scan.hasNextLine()) {
-	        	//System.out.println(scan.nextLine());
 	        	if(i==1) {
 	        		computerNumber.setNumber(Integer.valueOf(scan.nextLine()));
 	        	}
@@ -60,7 +159,7 @@ public class GameModel {
 	        		lastAnswers+=String.valueOf(array[0]);
 	        		lastAnswers+="\n";
 	        		lastAnswers+=String.valueOf(array[1]);
-	        		//System.out.println(lastAnswers);
+	        		
 	        		if (j == 0) {
 	        			computerTable.add(new Number(number, array));
 		        		j=1;
@@ -71,8 +170,6 @@ public class GameModel {
 	        		}
 	        		
 	        	}
-	        	
-	            //System.out.println(i + " : " + scan.nextLine());
 	            i++;
 	        }
 			reader.close();
@@ -83,6 +180,7 @@ public class GameModel {
 					boolArray[i] =Boolean.valueOf(scan.nextLine());
 					i++;
 				}
+			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -99,7 +197,6 @@ public class GameModel {
 		try
         {
 			writer = new FileWriter(fileName);
-			//writer.flush();
             writer.write(String.valueOf(computerNumber.getNumber()));
             writer.close();
         }
@@ -114,13 +211,19 @@ public class GameModel {
 			writer.write("\n"+String.valueOf(playerVariantFromTable)+"\n"+String.valueOf(playerBullsAndCowsFromTable[0])+"\n"+String.valueOf(playerBullsAndCowsFromTable[1]));
 			writer.write("\n"+String.valueOf(computerVariantFromTable)+"\n"+String.valueOf(computerBullsAndCowsFromTable[0])+"\n"+String.valueOf(computerBullsAndCowsFromTable[1]));
 			writer.close();
+			data.add(String.valueOf(playerVariantFromTable));
+			data.add(String.valueOf(playerBullsAndCowsFromTable[0]));
+			data.add(String.valueOf(playerBullsAndCowsFromTable[1]));
+			data.add(String.valueOf(computerVariantFromTable));
+			data.add(String.valueOf(computerBullsAndCowsFromTable[0]));
+			data.add(String.valueOf(computerBullsAndCowsFromTable[1]));
+			allAnswers+="\n"+String.valueOf(playerVariantFromTable)+"\n"+String.valueOf(playerBullsAndCowsFromTable[0])+"\n"+String.valueOf(playerBullsAndCowsFromTable[1]+"\n"+String.valueOf(computerVariantFromTable)+"\n"+String.valueOf(computerBullsAndCowsFromTable[0])+"\n"+String.valueOf(computerBullsAndCowsFromTable[1]));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
 	public void restartModel() {
-		//int playerNumberValue = playerNumber.getNumber();
 		computerNumber.setNumber(generateComputerNumber());
 		writeNumber();	
 		try {
@@ -128,11 +231,10 @@ public class GameModel {
 			writer.write("\n"+String.valueOf(playerNumber.getNumber()));
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
         
-		//playerNumber.setNumber(playerNumberValue);
 	}
 	public int[] getBullsAndCowsPlayer() {
 		return playerNumber.getBullsAndCows();
@@ -302,10 +404,15 @@ public class GameModel {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		
 		return number;
 	}
 }
+//	public void skipStep() {
+//		playerNumber.setVariant(0);
+//		stepOfGame();
+//	}
+//}

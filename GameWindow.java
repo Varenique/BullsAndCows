@@ -3,7 +3,13 @@ package application;
 
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -13,11 +19,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -26,30 +34,88 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 
  
 public class GameWindow {
 	
-	private Stage playStage;
-	private AnchorPane child;
-	private TextField numberToSend;
-	private Button buttonSend;
-	private Button buttonBack;
-	private Separator separator;
-	private ObservableList<Number> dataForComputerTable;
-	private ObservableList<Number> dataForPlayerTable;
-	private TableView<Number> tableViewComputerNumber;
-	private TableView<Number> tableViewPlayerNumber;
-	//private BullsAndCowsController controller;
-	
+	protected Stage playStage;
+	protected AnchorPane child;
+	protected TextField numberToSend;
+	protected Button buttonSend;
+	protected Button buttonBack;
+	protected Separator separator;
+	protected ObservableList<Number> dataForComputerTable;
+	protected ObservableList<Number> dataForPlayerTable;
+	protected TableView<Number> tableViewComputerNumber;
+	protected TableView<Number> tableViewPlayerNumber;
+	protected BullsAndCowsController controller;
+	public Label label = new Label();
+	public boolean check = false;
 	GameWindow(BullsAndCowsController controller) throws IOException{
-		
-		//this.controller = controller;
-		String titleBack="";
-		String tooltipBack="Back to the menu";
 		String titleSend="";
 		String tooltipSend="Send variant of number";
+		this.controller = controller;
+		numberToSend = new TextField();
+		    AnchorPane.setBottomAnchor(numberToSend, 155.0);
+			AnchorPane.setLeftAnchor(numberToSend, 650.0);
+			numberToSend.setPrefSize(200.0, 40.0);
+			
+			TextFormatter<String> formetterOnlyInt = new TextFormatter<>(c -> (
+					c.getText().matches("[0-9]*") == false || 
+		            c.getControlNewText().length() > 4 ) ? null : c);
+			numberToSend.setTextFormatter(formetterOnlyInt);
+			
+			
+			buttonSend= createButton(titleSend, tooltipSend, playStage);
+			AnchorPane.setBottomAnchor(buttonSend, 95.0);
+			AnchorPane.setLeftAnchor(buttonSend, 601.0);
+			buttonSend.setPrefSize(300.0, 50.0);
+			buttonSend.setId("buttonSend");
+			
+			buttonSend.setOnMouseClicked(mouseEvent -> {
+				
+				if(controller.makeStep(numberToSend.getText())) {
+					check =true;
+					showStep(Integer.valueOf(numberToSend.getText()));		
+				}
+			});
+			showDetails();		
+		
+	}
+	public void showStep(int numberFromPlayer){
+		dataForComputerTable.add(new Number(numberFromPlayer, controller.getBullsAndCowsPlayer()));
+		dataForPlayerTable.add(new Number(controller.getComputerVariant(), controller.getBullsAndCowsComputer()));
+		controller.saveTableData(numberFromPlayer, controller.getBullsAndCowsPlayer(), controller.getComputerVariant(), controller.getBullsAndCowsComputer() );
+		numberToSend.clear();
+		showTable(controller);
+		if(controller.getBullsAndCowsComputer()[0] == 4 || controller.getBullsAndCowsPlayer()[0] == 4) {
+			String message="";
+			if(controller.getBullsAndCowsComputer()[0] == 4 && controller.getBullsAndCowsPlayer()[0] != 4) {
+				message = "You lose! Computer number was "+ String.valueOf(controller.getComputerNumber());
+			}
+			else if(controller.getBullsAndCowsPlayer()[0] == 4 && controller.getBullsAndCowsComputer()[0] != 4){
+				message = "You win!";
+			}
+			else {
+				message = "Draw!";
+			}
+			buttonSend.setDisable(true);
+			try {
+				showDialogGameOver(message, controller);
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+
+		}
+	}
+	protected void showDetails() throws IOException {
+		String titleBack="";
+		String tooltipBack="Back to the menu";
+		
 		
 		playStage = new Stage();
 		playStage.setTitle("BullsAndCows");
@@ -58,65 +124,19 @@ public class GameWindow {
 		child = new AnchorPane();
 		child.getStyleClass().addAll("child");
 		
-		String stringValueOfNumber = String.valueOf(controller.transferGetPlayerNumber());
+		
 		//Tables
 		//First table
+		String stringValueOfNumber = String.valueOf(controller.transferGetPlayerNumber());
 		dataForPlayerTable = FXCollections.observableArrayList();
 		tableViewPlayerNumber = createTable(String.valueOf(stringValueOfNumber.charAt(0)), String.valueOf(stringValueOfNumber.charAt(1)), String.valueOf(stringValueOfNumber.charAt(2)), String.valueOf(stringValueOfNumber.charAt(3)), "Your number");
-
-	    
+		 
 	    //Second table
 		dataForComputerTable = FXCollections.observableArrayList();  
 	    tableViewComputerNumber = createTable("X","X","X","X","Computer number");
  
 	    
-	    numberToSend = new TextField();
-	    AnchorPane.setBottomAnchor(numberToSend, 155.0);
-		AnchorPane.setLeftAnchor(numberToSend, 650.0);
-		numberToSend.setPrefSize(200.0, 40.0);
-		
-		TextFormatter<String> formetterOnlyInt = new TextFormatter<>(c -> (
-				c.getText().matches("[0-9]*") == false || 
-	            c.getControlNewText().length() > 4 ) ? null : c);
-		numberToSend.setTextFormatter(formetterOnlyInt);
-		
-		
-		buttonSend= createButton(titleSend, tooltipSend, playStage);
-		AnchorPane.setBottomAnchor(buttonSend, 95.0);
-		AnchorPane.setLeftAnchor(buttonSend, 601.0);
-		buttonSend.setPrefSize(300.0, 50.0);
-		buttonSend.setId("buttonSend");
-		
-		buttonSend.setOnMouseClicked(mouseEvent -> {
-			if(controller.makeStep(numberToSend.getText())) {
-			
-			dataForComputerTable.add(new Number(Integer.valueOf(numberToSend.getText()), controller.getBullsAndCowsPlayer()));
-			dataForPlayerTable.add(new Number(controller.getComputerVariant(), controller.getBullsAndCowsComputer()));
-			controller.saveTableData(Integer.valueOf(numberToSend.getText()), controller.getBullsAndCowsPlayer(), controller.getComputerVariant(), controller.getBullsAndCowsComputer() );
-			numberToSend.clear();
-			showTable(controller);
-			if(controller.getBullsAndCowsComputer()[0] == 4 || controller.getBullsAndCowsPlayer()[0] == 4) {
-				String message="";
-				if(controller.getBullsAndCowsComputer()[0] == 4 && controller.getBullsAndCowsPlayer()[0] != 4) {
-					message = "You lose! Computer number was "+ String.valueOf(controller.getComputerNumber());
-				}
-				else if(controller.getBullsAndCowsPlayer()[0] == 4 && controller.getBullsAndCowsComputer()[0] != 4){
-					message = "You win!";
-				}
-				else {
-					message = "Draw!";
-				}
-				buttonSend.setDisable(true);
-				try {
-					showDialogGameOver(message, controller);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-			}
-		});
+	   
 		
 		buttonBack= createButton(titleBack, tooltipBack, playStage);
 		AnchorPane.setBottomAnchor(buttonBack, 50.0);	
@@ -154,8 +174,12 @@ public class GameWindow {
 	    flowPane.setPadding(new Insets(10));
 	    AnchorPane.setBottomAnchor(flowPane, 50.0);
 	    AnchorPane.setLeftAnchor(flowPane, 580.0);
+	  		
+	    AnchorPane.setLeftAnchor(label, 735.0);
+	    AnchorPane.setTopAnchor(label, 50.0);
+	    label.setId("labelTime");
 	    
-	    child.getChildren().addAll(buttonBack, tableViewPlayerNumber, tableViewComputerNumber, buttonSend, flowPane, separator, numberToSend);
+	    child.getChildren().addAll(buttonBack, tableViewPlayerNumber, tableViewComputerNumber, buttonSend, flowPane, separator, numberToSend, label);
 		Scene scene = new Scene(child,1500,700);
 		child.setId("gameWindow");
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -164,24 +188,35 @@ public class GameWindow {
 		playStage.getIcons().add(new Image("file:images/iconCow.png"));
 	}
 	private void showDialogGameOver(String message, BullsAndCowsController controller) throws IOException {
-		Alert dialog = new Alert(AlertType.INFORMATION);
-		dialog.initStyle(StageStyle.UTILITY);
+		//Alert dialog = new Alert(AlertType.INFORMATION);
+		TextInputDialog dialog = new TextInputDialog("");
+		dialog.setContentText("Name of file to save (will be in .txt format):");
+		//dialog.initStyle(StageStyle.UTILITY);
 		dialog.setTitle("Game Over");
 		dialog.setHeaderText(message);
-		dialog.showAndWait();
+		//dialog.showAndWait();
+		
+		Optional<String> nameOfFile = dialog.showAndWait();
+		if (nameOfFile.isPresent()){
+			
+			String nameOfFileString = nameOfFile.get();
+			controller.saveFile(nameOfFileString);
+			
+		}
 		MenuWindow menu = new MenuWindow(controller, playStage);
 		if(menu.showDialogForGame()) {
 			controller.restart();
 		}
+		
 	}
 	
-	private Button createButton(String title, String tooltip, Stage primaryStage) {
+	protected Button createButton(String title, String tooltip, Stage primaryStage) {
 		Button result = new Button(title);
 		result.setTooltip(new Tooltip(tooltip));
 		result.setCursor(Cursor.HAND);
 		return result;
 	}
-	private TableView<Number> createTable(String nameOfFirst, String nameOfSecond, String nameOfThird, String nameOfFourth, String nameOfFifth) {
+	protected TableView<Number> createTable(String nameOfFirst, String nameOfSecond, String nameOfThird, String nameOfFourth, String nameOfFifth) {
 		TableView<Number> tableView = new TableView<Number>(); 
 	    TableColumn <Number, Integer> firstColumn = new TableColumn<Number, Integer>(nameOfFirst);
 	    TableColumn <Number, Integer> secondColumn = new TableColumn<Number, Integer>(nameOfSecond);
@@ -218,5 +253,9 @@ public class GameWindow {
 	}
 	public void setDataForComputerTable(ObservableList<Number> dataForComputerTable) {
 		this.dataForComputerTable = dataForComputerTable;
+	}
+	public void skipAndShowStep() {
+		controller.skipStep(0);
+		showStep(0);
 	}
 }

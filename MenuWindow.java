@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class MenuWindow {
-	//private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private Stage primaryStage;
 	private AnchorPane root;
 	private Button buttonPlay;
@@ -30,6 +29,7 @@ public class MenuWindow {
 	private Button buttonRules;
 	private Button buttonExit;
 	private Button buttonContinue;
+	private Button buttonReplay;
 	MenuWindow(BullsAndCowsController controller, Stage stage){
 		this.controller = controller;
 		primaryStage = stage;
@@ -54,13 +54,12 @@ public class MenuWindow {
 		buttonPlay.setId("buttonPlay");
 		buttonPlay.setPrefSize(300.0, 50.0);
 		AnchorPane.setRightAnchor(buttonPlay, 350.0);
-		AnchorPane.setTopAnchor(buttonPlay, 375.0);	
+		AnchorPane.setTopAnchor(buttonPlay, 355.0);	
 		buttonPlay.setOnMouseClicked(mouseEvent -> {
 			
 			try {
 				showDialogForGame();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -70,65 +69,47 @@ public class MenuWindow {
 		buttonContinue.setId("buttonContinue");
 		buttonContinue.setPrefSize(300.0, 50.0);
 		AnchorPane.setRightAnchor(buttonContinue, 350.0);
-		AnchorPane.setTopAnchor(buttonContinue, 445.0);
+		AnchorPane.setTopAnchor(buttonContinue, 425.0);
 		buttonContinue.setOnMouseClicked(mouseEvent -> {
 			primaryStage.hide();
-			controller.startLastGame();
+			controller.startLastGame("");
 			try {
 				GameWindow game = new GameWindow(controller);
 				game.setDataForPlayerTable(controller.getPlayerTable());
 				game.setDataForComputerTable(controller.getComputerTable());
 				game.showTable(controller);
 				} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
+		
+		buttonReplay = createButton(titleRules, tooltipRules, primaryStage);
+		buttonReplay.setId("buttonReplay");
+		buttonReplay.setPrefSize(300.0, 50.0);
+		AnchorPane.setRightAnchor(buttonReplay, 350.0);
+		AnchorPane.setTopAnchor(buttonReplay, 495.0);
+		buttonReplay.setOnMouseClicked(mouseEvent -> {
+			showReplayDialog();});
 		
 		buttonRules = createButton(titleRules, tooltipRules, primaryStage);
 		buttonRules.setId("buttonRules");
 		buttonRules.setPrefSize(300.0, 50.0);
 		AnchorPane.setRightAnchor(buttonRules, 350.0);
-		AnchorPane.setTopAnchor(buttonRules, 515.0);
+		AnchorPane.setTopAnchor(buttonRules, 565.0);
 		buttonRules.setOnMouseClicked(mouseEvent -> {
 			showRules();});
 		
-		
-		
+			
 		buttonExit = createButton(titleExit, tooltipExit, primaryStage);
 		buttonExit.setId("buttonExit");
 		buttonExit.setPrefSize(300.0, 50.0);			
 		AnchorPane.setRightAnchor(buttonExit, 350.0);
-		AnchorPane.setTopAnchor(buttonExit, 585.0);
+		AnchorPane.setTopAnchor(buttonExit, 635.0);
 		buttonExit.setOnMouseClicked(mouseEvent -> {
-			primaryStage.close();});
-	
-		//Time demo-version
-		Label label = new Label();
-		int[] time = {01, 00}; 
-		label.setText("01:00");
+			primaryStage.close();});      
+        
 		
-		Timeline timeline = new Timeline (
-		    new KeyFrame (
-		        Duration.millis(1000 * 1), //1000 мс * 60 сек = 1 мин
-		        ae -> {
-		            
-		            if(time[1]==0) {
-		            	time[1]= 60;
-		            	time[0]--;
-		            }
-		            time[1]--;
-		            label.setText("" + time[0]+":"+time[1]);
-		        }
-		    )
-		);
-
-		timeline.setCycleCount(60); 
-		timeline.play(); 
-        
-        
-        
-        root.getChildren().addAll(buttonPlay, buttonContinue, buttonRules, buttonExit, label);
+        root.getChildren().addAll(buttonPlay, buttonContinue, buttonRules, buttonExit, buttonReplay);
 		Scene scene = new Scene(root,1000,700);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -147,17 +128,41 @@ public class MenuWindow {
 		Optional<String> playerNumber = dialog.showAndWait();
 		if (playerNumber.isPresent()){
 			primaryStage.hide();
+			controller.restart();
 			String playerNumberString = playerNumber.get();
 			controller.transferSetPlayerNumber(playerNumberString);
 			GameWindow game = new GameWindow(controller);
+			//thread with time for game window
+			TimeThread timeObject = new TimeThread(game);
+			Thread timeThread = new Thread(timeObject);
+			timeThread.start();
 			isNumber=true;
-			//showScene(playerNumber, primaryStage);
 		}
 		return isNumber;
 	}
+	public void showReplayDialog() {
+		
+		TextInputDialog dialog = new TextInputDialog("");
+		dialog.setTitle("Bulls and Cows");
+		dialog.setHeaderText("GAMES TO REPLAY:\n"+controller.getAllFiles());
+		dialog.setContentText("Please enter name of file to replay:");
+		Optional<String> fileNameToReplay = dialog.showAndWait();
+		if (fileNameToReplay.isPresent()){
+			primaryStage.hide();
+			String fileNameToReplayString = fileNameToReplay.get();
+			controller.readReplay(fileNameToReplayString);
+			try {
+				ReplayWindow window = new ReplayWindow(controller, fileNameToReplayString);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		
+		}
+		
+	}
 	private void showRules() {
 		Alert dialog = new Alert(AlertType.INFORMATION);
-
 		dialog.setTitle("Rules of BullsAndCows");
 		dialog.setHeaderText("Rules:");
 		dialog.showAndWait();
