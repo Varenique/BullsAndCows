@@ -23,7 +23,7 @@ public class GameModel {
 	int maxValue = 5040;
 	String fileName = "last.txt";
 	String fileNameBoolean = "lastBoolean.txt";
-	String directoryPath = "C:\\Users\\User\\eclipse-workspace\\BullsAndCowsUpdate\\filesOfData";
+	String directoryPath = "C:\\Users\\User\\workspace\\BullsAndCows\\filesOfData";
 	ObservableList<Number> playerTable;
 	ObservableList<Number> computerTable;
 	String lastAnswers = "";
@@ -45,14 +45,12 @@ public class GameModel {
 	}
 	public void saveFile(String replayFile) {
 		replayFile +=".txt";
-		//File newFile = new File(directoryPath+"\\"+replayFile); 
         try {
-			//if(newFile.createNewFile()) {
-				System.out.println(allAnswers);
-				FileWriter writerReplay = new FileWriter(directoryPath+"\\"+replayFile);
-				writerReplay.write(String.valueOf(computerNumber.getNumber())+"\n"+String.valueOf(playerNumber.getNumber())+allAnswers);
-				writerReplay.close();
-			//}
+			System.out.println(allAnswers);
+			FileWriter writerReplay = new FileWriter(directoryPath+"\\"+replayFile);
+			writerReplay.write(String.valueOf(computerNumber.getNumber())+"\n"+String.valueOf(playerNumber.getNumber())+allAnswers);
+			writerReplay.close();
+			allAnswers="";
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,34 +68,9 @@ public class GameModel {
 		}
 		return allFiles;
 	}
-//	public ObservableList<Number> getOneStep(String fileNameReplay) {
-//		ObservableList<Number> tableData = FXCollections.observableArrayList();
-//		fileNameReplay= directoryPath + "\\" + fileNameReplay;
-//			try {
-//				reader = new FileReader(fileNameReplay);
-//				Scanner scan = new Scanner(reader);
-//				int i = 1;
-//				
-//		        lastAnswers = "";
-//		        if (scan.hasNextLine()) {
-//		        	int number = Integer.valueOf(scan.nextLine());
-//		        	int[] array = new int[2];
-//		        	array[0] = Integer.valueOf(scan.nextLine());
-//		        	array[1] = Integer.valueOf(scan.nextLine());
-//		        	tableData.add(new Number(number, array));	
-//		        	i++;
-//		        }
-//				reader.close();
-//			} 
-//			catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			
-//		return tableData;	
-//	}
+
 	public void readReplay(String fileNameReplay) {
 		fileNameReplay= directoryPath + "\\" + fileNameReplay;
-		//System.out.println(fileNameReplay);
 		if(replaySteps != null) {
 			replaySteps.clear();
 		}
@@ -411,8 +384,3 @@ public class GameModel {
 		return number;
 	}
 }
-//	public void skipStep() {
-//		playerNumber.setVariant(0);
-//		stepOfGame();
-//	}
-//}
