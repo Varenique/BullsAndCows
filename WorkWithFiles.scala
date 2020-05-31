@@ -4,9 +4,11 @@ import scala.annotation.tailrec
 import System.nanoTime
 import scala.collection.mutable.ListBuffer
 import util.control.Breaks._
+import scala.io.Source
 
 object WorkWithFiles {
   def main(args: Array[String]): Unit = {
+    testJava.main(args);
     val filesListNames = new java.io.File("./filesOfData").listFiles.filter(_.getName.endsWith(".txt"))
     for (file <- filesListNames) {
       println(file)
@@ -21,11 +23,11 @@ object WorkWithFiles {
 
     }
     println("Time is " + elapsedTime + "ms")
-    val buf = scala.collection.mutable.ListBuffer.empty[Any]
-    val counterOfNumbers = scala.collection.mutable.ListBuffer(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    val buf = ListBuffer.empty[Any]
+    val counterOfNumbers = ListBuffer(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     var sourceList: List[Any] = Nil;
     for (file <- result) {
-      val source = scala.io.Source.fromFile("./filesOfData/" + file.getName()).getLines.reduceLeft(_ + _)
+      val source = Source.fromFile("./filesOfData/" + file.getName()).getLines.reduceLeft(_ + _)
       for (element <- source) {
         buf += element
       }
@@ -86,7 +88,7 @@ object WorkWithFiles {
     }
   }
   def getLists(file: File): ListBuffer[Int] = {
-    val currentFile = scala.collection.mutable.ListBuffer.empty[Int]
+    val currentFile = ListBuffer.empty[Int]
     var i: Integer = 0
     var countNumber: Integer = 0
     var skip: Integer = 8
@@ -96,7 +98,7 @@ object WorkWithFiles {
     countNumber = 0
     skip = 8
     number = 0
-    val source = scala.io.Source.fromFile("./filesOfData/" + file.getName()).getLines.reduceLeft(_ + _)
+    val source = Source.fromFile("./filesOfData/" + file.getName()).getLines.reduceLeft(_ + _)
     for (element <- source) {
       if (i > 7) {
         if (skip < 8) {
@@ -191,5 +193,7 @@ object WorkWithFiles {
     }
     return result
   }
-
+  def scala(){
+    println("scala check")
+  }
 }
